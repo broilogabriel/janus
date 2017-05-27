@@ -1,5 +1,5 @@
 # Janus Project
 
-`sbt docker:publishLocal`
+`sbt app/docker:publishLocal`
 
-`docker run --rm broilogabriel/janus:17.5.0`
+`docker run --rm broilogabriel/app:17.5.0`

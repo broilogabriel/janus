@@ -1,4 +1,4 @@
-package com.broilogabriel.hello
+package com.broilogabriel
 
 /**
   * Created by broilogabriel on 5/27/2017.

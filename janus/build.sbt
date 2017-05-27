@@ -1,28 +1,24 @@
 import Settings._
+import sbt.Keys.version
 import sbt._
 
-name := "janus"
-
-version := "17.5.0"
-
+def projectDescription(moduleName: String) = s"Janus Project: Module - $moduleName"
 
 lazy val root = project.root
-  .setName("janus")
-  .setDescription("ES Actors")
-  .setInitialCommand("_")
+  //  .setInitialCommand("_")
   .configureRoot
+  .dependsOn(core, app)
   .aggregate(core, app)
-
 
 lazy val core = project.from("core")
   .setName("core")
-  .setDescription("core project")
-  .setInitialCommand("_")
+  .setDescription(projectDescription("core"))
+//  .setInitialCommand("_")
   .configureModule
 
 lazy val app = project.from("app")
   .setName("app")
-  .setDescription("app project")
+  .setDescription(projectDescription("app"))
   .setInitialCommand("_")
   .configureModule
   .configureIntegrationTests
@@ -30,22 +26,23 @@ lazy val app = project.from("app")
   .configureUnitTests
   .dependsOnProjects(core)
   .enablePlugins(BuildInfoPlugin)
+  .enablePlugins(JavaAppPackaging)
   .settings(
-    mainClass in(Compile, run) := Some(Main.getClass.toString),
+    mainClass in(Compile, run) := Some("com.broilogabriel.Main"),
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := Settings.defaultOrg
+    buildInfoPackage := Settings.defaultOrg,
+    packageName in Docker := packageName.value,
+    version in Docker := version.value,
+    maintainer in Docker := "Gabriel Broilo <broilo.gabriel@gmail.com>",
+    dockerRepository := Some("broilogabriel"),
+    dockerBaseImage := "openjdk:latest",
+    dockerExposedPorts := Seq(9000, 9443)
   )
 
-enablePlugins(JavaAppPackaging)
 
-packageName in Docker := packageName.value
-
-version in Docker := version.value
-
-maintainer in Docker := "Gabriel Broilo <broilo.gabriel@gmail.com>"
-
-dockerBaseImage := "openjdk:latest"
-
-dockerRepository := Some("broilogabriel")
-
-dockerExposedPorts := Seq(9000, 9443)
+//packageName in Docker := packageName.value
+//version in Docker := version.value
+//maintainer in Docker := "Gabriel Broilo <broilo.gabriel@gmail.com>"
+//dockerBaseImage := "openjdk:latest"
+//dockerRepository := Some("broilogabriel")
+//dockerExposedPorts := Seq(9000, 9443)

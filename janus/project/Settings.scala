@@ -95,7 +95,7 @@ object Settings extends Dependencies {
     def setDescription(newDescription: String): Project = project.settings(description := newDescription)
 
     def setInitialCommand(newInitialCommand: String): Project =
-      project.settings(initialCommands := s"com.broilogabriel.$newInitialCommand")
+      project.settings(initialCommands := s"$defaultOrg.$newInitialCommand")
   }
 
   implicit class RootConfigurator(project: Project) {

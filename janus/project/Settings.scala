@@ -42,7 +42,7 @@ object Settings extends Dependencies {
         "-language:postfixOps",
         "-Ywarn-dead-code",
         "-Ywarn-infer-any",
-        "-Ywarn-unused-import",
+        //        "-Ywarn-unused-import",
         "-Xfatal-warnings",
         "-Xlint"
       ),

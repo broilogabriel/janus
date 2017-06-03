@@ -10,6 +10,10 @@ object Dependencies {
     Resolver.sonatypeRepo("public")
   )
 
+  // akka
+  val reactiveKafka: ModuleID = "com.typesafe.akka" %% "akka-stream-kafka" % "0.16"
+  val akka: Seq[ModuleID] = Seq(reactiveKafka)
+
   // logging
   val logback: ModuleID = "ch.qos.logback" % "logback-classic" % "1.1.7"
   val scalaLogging: ModuleID = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
@@ -24,7 +28,7 @@ trait Dependencies {
 
   val commonResolvers: Seq[Resolver] = resolvers
 
-  val mainDependencies: Seq[ModuleID] = Dependencies.logs
+  val mainDependencies: Seq[ModuleID] = Dependencies.logs ++ Dependencies.akka
 
   implicit class ProjectRoot(project: Project) {
     def root: Project = project in file(".")

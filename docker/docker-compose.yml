@@ -1,0 +1,31 @@
+version: "2"
+
+networks:
+  default:
+    external:
+      name: janus
+
+services:
+  kafka:
+    # https://hub.docker.com/r/ches/kafka/
+    image: ches/kafka:0.10.2.0
+    container_name: kafka
+    environment:
+      - ZOOKEEPER_IP=zookeeper
+      - KAFKA_ADVERTISED_HOST_NAME=192.168.1.9
+    volumes:
+      - ./kafka/data:/data
+      - ./kafka/logs:/logs
+    ports:
+      - 9092:9092
+      - 7203:7203
+    links:
+      - "zookeeper"
+    depends_on:
+      - "zookeeper"
+  zookeeper:
+    # https://store.docker.com/images/zookeeper
+    image: zookeeper:3.4
+    container_name: zookeeper
+    ports:
+      - 2181:2181

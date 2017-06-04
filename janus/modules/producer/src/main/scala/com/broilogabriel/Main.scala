@@ -3,15 +3,15 @@ package com.broilogabriel
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Producer
 import akka.kafka.{ProducerMessage, ProducerSettings}
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.joda.time.Instant
 
-/**
-  * Created by broilogabriel on 5/27/2017.
-  */
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationDouble
+
 object Main extends App {
 
   implicit val system = ActorSystem.create("janus")
@@ -21,17 +21,17 @@ object Main extends App {
     .withBootstrapServers("localhost:9092")
   //  val kafkaProducer = producerSettings.createKafkaProducer()
 
-
   println(s"Produce the ${Hello.world}")
 
-  val done = Source(1 to 100)
+  val ref = Source.actorRef[String](0, OverflowStrategy.fail)
     .map {
-      n =>
+      message =>
         // val partition = math.abs(n) % 2
         val partition = 0
-        ProducerMessage.Message(new ProducerRecord[Array[Byte], String](
-          "janus", partition, null, n.toString
-        ), n)
+        ProducerMessage.Message(
+          new ProducerRecord[Array[Byte], String]("janus", partition, null, message),
+          message
+        )
     }
     .via(Producer.flow(producerSettings))
     .map {
@@ -41,9 +41,12 @@ object Main extends App {
           s"(${result.message.passThrough})")
         result
     }
-    .runWith(Sink.ignore)
+    .toMat(Sink.ignore)(Keep.left)
+    .run()
 
-
-  done.onComplete(_ => system.terminate())
+  system.scheduler.schedule(1.second, 10.seconds) {
+    ref ! s"RUN, FOREST RUN ${Instant.now()}"
+  }
 }
+
 

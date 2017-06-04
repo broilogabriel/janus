@@ -1,4 +1,3 @@
-import Dependencies.{resolvers, scalaVersion}
 import sbt._
 
 object Dependencies {
@@ -9,6 +8,10 @@ object Dependencies {
   val resolvers = Seq(
     Resolver.sonatypeRepo("public")
   )
+
+  // utilities
+  val joda: ModuleID = "joda-time" % "joda-time" % "2.9.9"
+  val utilities: Seq[ModuleID] = Seq(joda)
 
   // akka
   val reactiveKafka: ModuleID = "com.typesafe.akka" %% "akka-stream-kafka" % "0.16"
@@ -24,11 +27,13 @@ object Dependencies {
 
 trait Dependencies {
 
+  import Dependencies._
+
   val scalaVersionUsed: String = scalaVersion
 
   val commonResolvers: Seq[Resolver] = resolvers
 
-  val mainDependencies: Seq[ModuleID] = Dependencies.logs ++ Dependencies.akka
+  val mainDependencies: Seq[ModuleID] = utilities ++ logs ++ akka
 
   implicit class ProjectRoot(project: Project) {
     def root: Project = project in file(".")
